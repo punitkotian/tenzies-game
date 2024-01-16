@@ -1,25 +1,82 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Die from "./Component/Die";
+import { nanoid } from "nanoid";
+import Confetti from "react-confetti";
+// import './App.css';
 
-function App() {
+export default function App() {
+  const [dice, setDice] = React.useState(allNewDice());
+  const [tenzies, setTenzies] = React.useState(false)
+
+  React.useEffect(() => {
+
+    const allHeld = dice.every(die => die.isHeld)
+    const firstValue = dice[0].value
+    const allSameValue = allHeld ? dice.every(die => die.value === firstValue) : false
+    
+    if (allSameValue) {
+      setTenzies(true)
+    }
+  }, [dice])
+
+  function allNewDice() {
+    const newDice = []
+      for (let i = 0; i < 10; i++) {
+        newDice.push(generateNewDie());
+      }
+    return newDice;
+  }
+
+  function generateRandomNum() {
+    return Math.floor(Math.random() * 5) + 1;
+  }
+  
+  function generateNewDie() {
+    return {
+      value: generateRandomNum(),
+      isHeld: false,
+      id: nanoid(),
+    }
+  }
+
+  function rollDice() {
+    if (!tenzies === true) {
+      setDice(oldDice => oldDice.map(die => ({
+        ...die, value : die.isHeld ? die.value : generateRandomNum()
+      })));
+    } else {
+      setTenzies(false)
+      setDice(allNewDice())
+    }
+  }
+
+  function holdDice(id) {
+    setDice((ps) => ps.map(curr_die  => {
+      return curr_die.id === id ? {...curr_die, isHeld: !curr_die.isHeld} : curr_die
+    }));
+  }
+
+  const diceElements = dice.map((obj, index) => {
+    return (
+      <Die
+        value={obj.value}
+        isHeld={obj.isHeld}
+        key={obj.id}
+        holdDice={(event) => holdDice(obj.id)}
+
+      />
+    ); 
+  });
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main>
+      { tenzies && <Confetti/> }
+      <h1 className="title">Tenzies</h1>
+      <p className="instruction">Roll until all dice are the same. Click each die to freeze it at its current value between rolls.</p>
+      <div className="dice-container">{diceElements}</div>
+      <button className="roll-dice" onClick={rollDice}>
+        { !tenzies ? 'Roll' : 'New Game' }
+      </button>
+    </main>
   );
 }
-
-export default App;
