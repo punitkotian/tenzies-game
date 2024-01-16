@@ -1,5 +1,5 @@
 import React from "react";
-import Die from "./Component/Die";
+import Dice from "./Component/Dice";
 import { nanoid } from "nanoid";
 import Confetti from "react-confetti";
 // import './App.css';
@@ -58,7 +58,7 @@ export default function App() {
 
   const diceElements = dice.map((obj, index) => {
     return (
-      <Die
+      <Dice
         value={obj.value}
         isHeld={obj.isHeld}
         key={obj.id}
