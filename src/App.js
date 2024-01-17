@@ -8,19 +8,32 @@ export default function App() {
   const [totalTime, setTotalTime] = React.useState(new Date().getTime());
   const [dice, setDice] = React.useState(allNewDice());
   const [tenzies, setTenzies] = React.useState(false);
+  const [bestTime, setBestTime] = React.useState(
+    parseFloat(localStorage.getItem("bestTime")) || Infinity
+  );
+  const [isBestTime, setIsBestTime] = React.useState(false)
 
   React.useEffect(() => {
     const allHeld = dice.every((die) => die.isHeld);
     const firstValue = dice[0].value;
     const allSameValue = allHeld
       ? dice.every((die) => die.value === firstValue)
-      : false;
+      : false
 
     if (allSameValue) {
       setTenzies(true);
-      setTotalTime((ps) => (new Date().getTime() - ps) / 1000);
+      const elapsedTime = new Date().getTime() - totalTime
+      console.log(elapsedTime)
+      setTotalTime(elapsedTime / 1000)
+      setIsBestTime(bestTime > elapsedTime)
+      if (isBestTime) {
+        localStorage.setItem("bestTime", elapsedTime.toString())
+        setBestTime(elapsedTime)
+      }
     }
   }, [dice]);
+
+
 
   function allNewDice() {
     const newDice = [];
@@ -50,7 +63,7 @@ export default function App() {
           value: die.isHeld ? die.value : generateRandomNum(),
         }))
       );
-      setNumOfRolls((ps) => ps + 1);
+      setNumOfRolls((ps) => ps + 1)
     } else {
       setDice(allNewDice());
       setTenzies(false);
@@ -92,13 +105,17 @@ export default function App() {
       <button className="roll-dice" onClick={rollDice}>
         {!tenzies ? "Roll" : "New Game"}
       </button>
-      <p>
-        {tenzies
-          ? `Congratulations! You won in ${numOfRolls} rolls! Total Time: ${Math.floor(
-              totalTime / 60
-            )} minutes and ${Math.round(totalTime % 60)} seconds`
-          : `Current Rolls: ${numOfRolls}`}
-      </p>
+      {tenzies && (
+        <p>
+          {isBestTime
+            ? `Congratulations! You achieved victory in ${numOfRolls} rolls, setting a new record time of ${Math.floor(
+                totalTime / 60
+              )} minutes and ${Math.round(totalTime % 60)} seconds!`
+            : `Congratulations on your win! You completed the game in ${numOfRolls} rolls, taking ${Math.floor(
+                totalTime / 60
+              )} minutes and ${Math.round(totalTime % 60)} seconds.`}
+        </p>
+      )}
     </main>
   );
 }
