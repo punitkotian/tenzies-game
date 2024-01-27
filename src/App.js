@@ -11,29 +11,26 @@ export default function App() {
   const [bestTime, setBestTime] = React.useState(
     parseFloat(localStorage.getItem("bestTime")) || Infinity
   );
-  const [isBestTime, setIsBestTime] = React.useState(false)
+  const [isBestTime, setIsBestTime] = React.useState(false);
 
   React.useEffect(() => {
     const allHeld = dice.every((die) => die.isHeld);
     const firstValue = dice[0].value;
     const allSameValue = allHeld
       ? dice.every((die) => die.value === firstValue)
-      : false
+      : false;
 
     if (allSameValue) {
       setTenzies(true);
-      const elapsedTime = new Date().getTime() - totalTime
-      console.log(elapsedTime)
-      setTotalTime(elapsedTime / 1000)
-      setIsBestTime(bestTime > elapsedTime)
-      if (isBestTime) {
-        localStorage.setItem("bestTime", elapsedTime.toString())
-        setBestTime(elapsedTime)
+      const elapsedTime = new Date().getTime() - totalTime;
+      setTotalTime(elapsedTime / 1000);
+      setIsBestTime(bestTime > elapsedTime);
+      if (bestTime > elapsedTime) {
+        localStorage.setItem("bestTime", elapsedTime.toString());
+        setBestTime(elapsedTime);
       }
     }
   }, [dice]);
-
-
 
   function allNewDice() {
     const newDice = [];
@@ -63,7 +60,7 @@ export default function App() {
           value: die.isHeld ? die.value : generateRandomNum(),
         }))
       );
-      setNumOfRolls((ps) => ps + 1)
+      setNumOfRolls((ps) => ps + 1);
     } else {
       setDice(allNewDice());
       setTenzies(false);
